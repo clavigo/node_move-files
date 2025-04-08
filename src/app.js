@@ -14,7 +14,7 @@ const moveFiles = () => {
   }
 
   const source = params[0];
-  let destination = params[1];
+  const destination = params[1];
 
   if (!fs.existsSync(source)) {
     console.error('Source not exist');
@@ -22,30 +22,38 @@ const moveFiles = () => {
     return;
   }
 
-  const isDestDir =
-    destination.endsWith('/') ||
-    (fs.existsSync(destination) && fs.statSync(destination).isDirectory());
-
-  if (isDestDir) {
-    const filename = path.basename(source);
-
-    destination = path.join(destination, filename);
-  }
-
-  const targetDir = path.dirname(destination);
-
-  if (!fs.existsSync(targetDir)) {
-    console.error('Destination directory does not exist');
+  if (!fs.statSync(source).isFile()) {
+    console.error('Source is not a file');
 
     return;
   }
 
-  if (source === destination) {
+  let finalDestination = destination;
+
+  if (fs.existsSync(destination) && fs.statSync(destination).isDirectory()) {
+    const fileName = path.basename(source);
+
+    finalDestination = path.join(destination, fileName);
+  } else if (destination.endsWith('/')) {
+    console.error('Destination directory does not exist');
+
+    return;
+  } else {
+    const destDir = path.dirname(destination);
+
+    if (!fs.existsSync(destDir)) {
+      console.error('Destination directory does not exist');
+
+      return;
+    }
+  }
+
+  if (source === finalDestination) {
     return;
   }
 
   try {
-    fs.renameSync(source, destination);
+    fs.renameSync(source, finalDestination);
   } catch (err) {
     console.error(err);
   }
