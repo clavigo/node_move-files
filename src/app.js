@@ -49,7 +49,7 @@ const moveFiles = () => {
   }
 
   if (source === finalDestination) {
-    console.error('Source and destination are the same');
+    console.log('Source and destination are the same');
 
     return;
   }
